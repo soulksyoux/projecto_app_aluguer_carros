@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::apiResource("cliente", ClienteController::class);
-Route::apiResource("carro", ClienteController::class);
-Route::apiResource("marca", ClienteController::class);
-Route::apiResource("modelo", ClienteController::class);
-Route::apiResource("locacao", ClienteController::class);
+Route::apiResource("carro", CarroController::class);
+Route::apiResource("marca", MarcaController::class);
+Route::apiResource("modelo", ModeloController::class);
+Route::apiResource("locacao", LocacaoController::class);
