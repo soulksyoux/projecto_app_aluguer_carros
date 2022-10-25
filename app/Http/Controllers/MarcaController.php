@@ -48,7 +48,12 @@ class MarcaController extends Controller
      */
     public function show($id)
     {
-        return $this->marca->find($id);
+        $marca = $this->marca->find($id);
+        if(empty($marca)) {
+            return ["msg" => "Registo não encontrado no sistema"];
+        }
+
+        return $marca;
     }
 
 
@@ -62,6 +67,10 @@ class MarcaController extends Controller
     public function update(Request $request, $id)
     {
         $marca = $this->marca->find($id);
+        if(empty($marca)) {
+            return ["msg" => "Registo não encontrado no sistema!"];
+        }
+
         $marca->update($request->all());
         return $marca;
     }
@@ -75,6 +84,9 @@ class MarcaController extends Controller
     public function destroy($id)
     {
         $marca = $this->marca->find($id);
+        if(empty($marca)) {
+            return ["msg" => "Registo não encontrado no sistema!"];
+        }
         $marca->delete();
         return ["msg" => "Marca removida com sucesso"];
     }
