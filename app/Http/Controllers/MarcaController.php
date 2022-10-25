@@ -23,7 +23,7 @@ class MarcaController extends Controller
     {
         //$marcas = Marca::all();
         $marcas = $this->marca->all();
-        return $marcas;
+        return response()->json($marcas,200);
     }
 
 
@@ -37,7 +37,7 @@ class MarcaController extends Controller
     {
         //$marca = Marca::create($request->all());
         $marca = $this->marca->create($request->all());
-        return $marca;        
+        return response()->json($marca, 201);        
     }
 
     /**
@@ -50,10 +50,11 @@ class MarcaController extends Controller
     {
         $marca = $this->marca->find($id);
         if(empty($marca)) {
-            return ["msg" => "Registo não encontrado no sistema"];
+            return response()->json(["msg" => "Registo não encontrado no sistema"], 404);
         }
 
-        return $marca;
+        return response()->json($marca,200);
+
     }
 
 
@@ -68,11 +69,12 @@ class MarcaController extends Controller
     {
         $marca = $this->marca->find($id);
         if(empty($marca)) {
-            return ["msg" => "Registo não encontrado no sistema!"];
+            return response()->json(["msg" => "Registo não encontrado no sistema!"], 404);
         }
 
         $marca->update($request->all());
-        return $marca;
+        return response()->json($marca,200);
+
     }
 
     /**
@@ -85,9 +87,9 @@ class MarcaController extends Controller
     {
         $marca = $this->marca->find($id);
         if(empty($marca)) {
-            return ["msg" => "Registo não encontrado no sistema!"];
+            return response()->json(["msg" => "Registo não encontrado no sistema!"], 404);
         }
         $marca->delete();
-        return ["msg" => "Marca removida com sucesso"];
+        return response()->json(["msg" => "Marca removida com sucesso"], 200);
     }
 }
