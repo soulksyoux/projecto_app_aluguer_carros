@@ -37,21 +37,13 @@ class MarcaController extends Controller
     {
         //$marca = Marca::create($request->all());
 
-        $regras = [
-            "nome" => "required|unique:marcas",
-            "imagem" => "required",
+        $request->validate($this->marca->regras(), $this->marca->mensagens());
 
-        ];
-        $mensagens = [
-            "required" => "O campo :attribute é obrigatório",
-            "nome.unique" => "O nome da marca já existe",
-        ];
-
-        $request->validate($regras, $mensagens);
-        
         $marca = $this->marca->create($request->all());
         return response()->json($marca, 201);        
     }
+
+    //o cliente precisa de dizer previamente que sabe lidar com retorno de application\json
 
     /**
      * Display the specified resource.

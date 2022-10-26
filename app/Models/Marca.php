@@ -9,4 +9,18 @@ class Marca extends Model
 {
     use HasFactory;
     protected $fillable = ['nome', 'imagem'];
+
+    public function regras() {
+        return [
+            "nome" => "required|unique:marcas",
+            "imagem" => "required",
+        ];
+    }
+
+    public function mensagens() {
+        return [
+            "required" => "O campo :attribute é obrigatório",
+            "nome.unique" => "O nome da marca já existe",
+        ];
+    }
 }
