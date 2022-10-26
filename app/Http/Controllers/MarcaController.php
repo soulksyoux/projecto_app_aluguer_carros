@@ -72,10 +72,22 @@ class MarcaController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         $marca = $this->marca->find($id);
         if(empty($marca)) {
             return response()->json(["msg" => "Registo não encontrado no sistema!"], 404);
         }
+
+        $regras_dinamicas = [];
+
+        foreach($marca->regras() as $input => $regras) {
+            if(array_key_exists($input, $request->all())) {
+                $regras_dinamicas[$input] = $regras;
+            }
+        }
+
+
+        $request->validate($regras_dinamicas, $marca->mensagens());
 
         $marca->update($request->all());
         return response()->json($marca,200);
