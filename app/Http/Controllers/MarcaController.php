@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreMarcaRequest;
+use App\Http\Requests\UpdateMarcaRequest;
 use App\Models\Marca;
 use Illuminate\Http\Request;
 
@@ -33,6 +35,7 @@ class MarcaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    /*
     public function store(Request $request)
     {
         //$marca = Marca::create($request->all());
@@ -42,6 +45,21 @@ class MarcaController extends Controller
         $marca = $this->marca->create($request->all());
         return response()->json($marca, 201);        
     }
+    */
+
+
+    public function store(StoreMarcaRequest $request)
+    {
+        //$marca = Marca::create($request->all());
+
+        //$request->validate($this->marca->regras(), $this->marca->mensagens());
+        //$request->validate();
+
+        $marca = $this->marca->create($request->all());
+        return response()->json($marca, 201);        
+    }
+
+
 
     //o cliente precisa de dizer previamente que sabe lidar com retorno de application\json
 
@@ -70,6 +88,7 @@ class MarcaController extends Controller
      * @param  Integer
      * @return \Illuminate\Http\Response
      */
+    /*
     public function update(Request $request, $id)
     {
 
@@ -93,6 +112,36 @@ class MarcaController extends Controller
         return response()->json($marca,200);
 
     }
+    */
+
+
+    public function update(UpdateMarcaRequest $request, $id)
+    {
+
+        $marca = $this->marca->find($id);
+        if(empty($marca)) {
+            return response()->json(["msg" => "Registo não encontrado no sistema!"], 404);
+        }
+
+        /*
+        $regras_dinamicas = [];
+
+        foreach($marca->regras() as $input => $regras) {
+            if(array_key_exists($input, $request->all())) {
+                $regras_dinamicas[$input] = $regras;
+            }
+        }
+        */
+
+
+        //$request->validate($regras_dinamicas, $marca->mensagens());
+
+        $marca->update($request->all());
+        return response()->json($marca,200);
+
+    }
+
+
 
     /**
      * Remove the specified resource from storage.
