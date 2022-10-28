@@ -55,7 +55,14 @@ class MarcaController extends Controller
         //$request->validate($this->marca->regras(), $this->marca->mensagens());
         //$request->validate();
 
-        $marca = $this->marca->create($request->all());
+        $imagem = $request->imagem;
+        $imagem_urn = $imagem->store("imagens", "public");
+        
+        $marca = $this->marca->create([
+            "nome" => $request->nome,
+            "imagem" => $imagem_urn,
+        ]);
+
         return response()->json($marca, 201);        
     }
 
@@ -117,11 +124,12 @@ class MarcaController extends Controller
 
     public function update(UpdateMarcaRequest $request, $id)
     {
-
+        
         $marca = $this->marca->find($id);
         if(empty($marca)) {
             return response()->json(["msg" => "Registo não encontrado no sistema!"], 404);
         }
+
 
         /*
         $regras_dinamicas = [];
@@ -136,7 +144,14 @@ class MarcaController extends Controller
 
         //$request->validate($regras_dinamicas, $marca->mensagens());
 
-        $marca->update($request->all());
+        $imagem = $request->imagem;
+        $imagem_urn = $imagem->store("imagens", "public");
+
+        $marca->update([
+            "nome" => $request->nome,
+            "imagem" => $imagem_urn, 
+        ]);
+        
         return response()->json($marca,200);
 
     }

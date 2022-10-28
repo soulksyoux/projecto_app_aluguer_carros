@@ -25,7 +25,7 @@ class StoreMarcaRequest extends FormRequest
     {
         return [
             "nome" => 'required|unique:marcas',
-            "imagem" => "required",
+            "imagem" => "required|file|mimes:png",
         ];
     }
 
@@ -33,6 +33,8 @@ class StoreMarcaRequest extends FormRequest
         return [
             "required" => "O campo :attribute é obrigatório",
             "nome.unique" => "O nome da marca já existe",
+            "imagem.file" => "Tipo de input inválido",
+            "imagem.mimes" => "Formato de imagem inválido, tem de ser png",
         ];
     }
 }
