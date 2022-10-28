@@ -6,6 +6,7 @@ use App\Http\Requests\StoreMarcaRequest;
 use App\Http\Requests\UpdateMarcaRequest;
 use App\Models\Marca;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MarcaController extends Controller
 {
@@ -144,6 +145,11 @@ class MarcaController extends Controller
 
         //$request->validate($regras_dinamicas, $marca->mensagens());
 
+        if($request->file('imagem')) {
+            Storage::disk("public")->delete($marca->imagem);
+        }
+
+
         $imagem = $request->imagem;
         $imagem_urn = $imagem->store("imagens", "public");
 
@@ -170,6 +176,9 @@ class MarcaController extends Controller
         if(empty($marca)) {
             return response()->json(["msg" => "Registo não encontrado no sistema!"], 404);
         }
+
+        Storage::disk("public")->delete($marca->imagem);
+
         $marca->delete();
         return response()->json(["msg" => "Marca removida com sucesso"], 200);
     }
