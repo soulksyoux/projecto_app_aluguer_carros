@@ -22,11 +22,35 @@ class MarcaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //$marcas = Marca::all();
-        $marcas = $this->marca->with("modelos")->get();
-        return response()->json($marcas,200);
+        $marcas = $this->marca;
+
+        //atributos
+        if($request->has("atributos")) {
+            $atributos = $request->get("atributos");
+            $marcas = $this->marca->selectRaw($atributos);
+        }
+
+        //atributos do modelo
+        if($request->has("atributos_modelo")) {
+            $atributos_modelo = $request->get("atributos_modelo");
+            $marcas = $marcas->with("modelos:$atributos_modelo");
+        }else{
+            $marcas = $marcas->with("modelos");
+        }
+
+        //filtros
+        if($request->has("filtros")) {
+            $filtros = explode(";", $request->get("filtros"));
+            foreach($filtros as $filtro) {
+                [$campo, $operador, $valor] = explode(":", $filtro);
+                $marcas = $marcas->where($campo, $operador, $valor);
+            }
+        }
+
+  
+        return response()->json($marcas->get(),200);
     }
 
 
