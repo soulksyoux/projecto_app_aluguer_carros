@@ -25,7 +25,7 @@ class MarcaController extends Controller
     public function index()
     {
         //$marcas = Marca::all();
-        $marcas = $this->marca->all();
+        $marcas = $this->marca->with("modelos")->get();
         return response()->json($marcas,200);
     }
 
@@ -79,7 +79,7 @@ class MarcaController extends Controller
      */
     public function show($id)
     {
-        $marca = $this->marca->find($id);
+        $marca = $this->marca->with("modelos")->find($id);
         if(empty($marca)) {
             return response()->json(["msg" => "Registo não encontrado no sistema"], 404);
         }
@@ -145,18 +145,18 @@ class MarcaController extends Controller
 
         //$request->validate($regras_dinamicas, $marca->mensagens());
 
+
+        $imagem_urn = $marca->imagem;
+
         if($request->file('imagem')) {
             Storage::disk("public")->delete($marca->imagem);
+            $imagem = $request->imagem;
+            $imagem_urn = $imagem->store("imagens", "public");
         }
 
-
-        $imagem = $request->imagem;
-        $imagem_urn = $imagem->store("imagens", "public");
-
-        $marca->update([
-            "nome" => $request->nome,
-            "imagem" => $imagem_urn, 
-        ]);
+        $marca->fill($request->all());
+        $marca->imagem = $imagem_urn;
+        $marca->save();
         
         return response()->json($marca,200);
 

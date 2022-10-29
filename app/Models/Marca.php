@@ -23,4 +23,9 @@ class Marca extends Model
             "nome.unique" => "O nome da marca já existe",
         ];
     }
+
+    public function modelos()
+    {
+        return $this->hasMany("App\Models\Modelo");
+    }
 }

@@ -1,0 +1,9 @@
+create database lc;
+use lc;
+
+select * from carros;
+select * from clientes;
+select * from marcas;
+select * from modelos;
+select * from locacoes;
+
