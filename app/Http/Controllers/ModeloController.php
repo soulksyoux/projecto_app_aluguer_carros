@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreModeloRequest;
 use App\Http\Requests\UpdateModeloRequest;
 use App\Models\Modelo;
+use App\Repositories\ModeloRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -24,30 +25,27 @@ class ModeloController extends Controller
      */
     public function index(Request $request)
     {
-        $modelos = $this->modelo;
+        //$modelos = $this->modelo;
+
+        $modeloRepository = new ModeloRepository($this->modelo);
 
         if($request->has("atributos")) {
             $atributos = $request->get("atributos");
-            $modelos = $modelos->selectRaw($atributos);
+            $modeloRepository->selectAtributosEscolhidos($atributos);
         }
 
         if($request->has("atributos_marca")) {
             $atributos_marca = $request->get("atributos_marca");
-            $modelos = $modelos->with("marca:$atributos_marca");
+            $modeloRepository->selectAtributosRelacionadosEscolhidos("marca:$atributos_marca");
         }else{
-            $modelos = $modelos->with("marca");
+            $modeloRepository->selectAtributosRelacionadosEscolhidos("marca");
         }
 
         if($request->has("filtros")) {
-            $filtros = explode(";", $request->get("filtros"));
-
-            foreach($filtros as $filtro) {
-                [$campo, $operador, $pesquisa] = explode(":", $filtro);
-                $modelos = $modelos->where($campo, $operador, $pesquisa);
-            }
+            $modeloRepository->aplicarFiltros($request->get("filtros"));
         }
 
-        return response()->json($modelos->get(), 200);
+        return response()->json($modeloRepository->getResultado(), 200);
     }
 
 

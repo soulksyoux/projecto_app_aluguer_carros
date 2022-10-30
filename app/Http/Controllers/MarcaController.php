@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreMarcaRequest;
 use App\Http\Requests\UpdateMarcaRequest;
 use App\Models\Marca;
+use App\Repositories\MarcaRepository;
+use App\Repositories\ModeloRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class MarcaController extends Controller
 {
 
-    private $marca; 
+    private $marca;
 
     public function __construct(Marca $marca)
     {
@@ -24,33 +26,32 @@ class MarcaController extends Controller
      */
     public function index(Request $request)
     {
-        $marcas = $this->marca;
+
+        $marcaRepository = new MarcaRepository($this->marca);
+
+        //$marcas = $this->marca;
 
         //atributos
-        if($request->has("atributos")) {
+        if ($request->has("atributos")) {
             $atributos = $request->get("atributos");
-            $marcas = $this->marca->selectRaw($atributos);
+            $marcaRepository->selectAtributosEscolhidos($atributos);
         }
 
         //atributos do modelo
-        if($request->has("atributos_modelo")) {
+        if ($request->has("atributos_modelo")) {
             $atributos_modelo = $request->get("atributos_modelo");
-            $marcas = $marcas->with("modelos:$atributos_modelo");
-        }else{
-            $marcas = $marcas->with("modelos");
+            $marcaRepository->selectAtributosRelacionadosEscolhidos("modelos:$atributos_modelo");
+        } else {
+            $marcaRepository->selectAtributosRelacionadosEscolhidos("modelos");
         }
 
         //filtros
-        if($request->has("filtros")) {
-            $filtros = explode(";", $request->get("filtros"));
-            foreach($filtros as $filtro) {
-                [$campo, $operador, $valor] = explode(":", $filtro);
-                $marcas = $marcas->where($campo, $operador, $valor);
-            }
+        if ($request->has("filtros")) {
+            $marcaRepository->aplicarFiltros($request->get("filtros"));
         }
 
-  
-        return response()->json($marcas->get(),200);
+        //return response()->json($this->marca->get(), 200);
+        return response()->json($marcaRepository->getResultado(), 200);
     }
 
 
@@ -82,13 +83,13 @@ class MarcaController extends Controller
 
         $imagem = $request->imagem;
         $imagem_urn = $imagem->store("imagens", "public");
-        
+
         $marca = $this->marca->create([
             "nome" => $request->nome,
             "imagem" => $imagem_urn,
         ]);
 
-        return response()->json($marca, 201);        
+        return response()->json($marca, 201);
     }
 
 
@@ -104,12 +105,11 @@ class MarcaController extends Controller
     public function show($id)
     {
         $marca = $this->marca->with("modelos")->find($id);
-        if(empty($marca)) {
+        if (empty($marca)) {
             return response()->json(["msg" => "Registo não encontrado no sistema"], 404);
         }
 
-        return response()->json($marca,200);
-
+        return response()->json($marca, 200);
     }
 
 
@@ -149,9 +149,9 @@ class MarcaController extends Controller
 
     public function update(UpdateMarcaRequest $request, $id)
     {
-        
+
         $marca = $this->marca->find($id);
-        if(empty($marca)) {
+        if (empty($marca)) {
             return response()->json(["msg" => "Registo não encontrado no sistema!"], 404);
         }
 
@@ -172,7 +172,7 @@ class MarcaController extends Controller
 
         $imagem_urn = $marca->imagem;
 
-        if($request->file('imagem')) {
+        if ($request->file('imagem')) {
             Storage::disk("public")->delete($marca->imagem);
             $imagem = $request->imagem;
             $imagem_urn = $imagem->store("imagens", "public");
@@ -181,9 +181,8 @@ class MarcaController extends Controller
         $marca->fill($request->all());
         $marca->imagem = $imagem_urn;
         $marca->save();
-        
-        return response()->json($marca,200);
 
+        return response()->json($marca, 200);
     }
 
 
@@ -197,7 +196,7 @@ class MarcaController extends Controller
     public function destroy($id)
     {
         $marca = $this->marca->find($id);
-        if(empty($marca)) {
+        if (empty($marca)) {
             return response()->json(["msg" => "Registo não encontrado no sistema!"], 404);
         }
 
