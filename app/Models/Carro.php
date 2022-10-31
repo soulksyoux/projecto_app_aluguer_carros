@@ -15,4 +15,8 @@ class Carro extends Model
     public function modelo() {
         return $this->belongsTo("App\Models\Modelo");
     }
+
+    public function locacoes() {
+        return $this->hasMany("App\Models\Locacao");
+    }
 }

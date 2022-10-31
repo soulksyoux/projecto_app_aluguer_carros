@@ -35,12 +35,20 @@ class CarroController extends Controller
             $carroRepository->selectAtributosEscolhidos($atributos);
         }
         
-        //atributos relacionados
-        if($request->has("atributos_escolhidos")) {
-            $atributos_modelo = $request->get("atributos_escolhidos");
+        //atributos modelo
+        if($request->has("atributos_modelo")) {
+            $atributos_modelo = $request->get("atributos_modelo");
             $carroRepository->selectAtributosRelacionadosEscolhidos("modelo:$atributos_modelo");
         }else{    
             $carroRepository->selectAtributosRelacionadosEscolhidos("modelo");
+        }
+
+        //atributos locacoes
+        if($request->has("atributos_locacao")) {
+            $atributos_modelo = $request->get("atributos_locacao");
+            $carroRepository->selectAtributosRelacionadosEscolhidos("locacoes:$atributos_modelo");
+        }else{    
+            $carroRepository->selectAtributosRelacionadosEscolhidos("locacoes");
         }
 
         //filtros
@@ -72,7 +80,7 @@ class CarroController extends Controller
      */
     public function show($id)
     {
-        $carro = $this->carro->with("modelo")->find($id);
+        $carro = $this->carro->with("modelo", "locacoes")->find($id);
 
         if(empty($carro)) {
             return response()->json(["msg" => "Registo não encontrado no sistema"], 404);

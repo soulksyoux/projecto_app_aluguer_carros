@@ -24,7 +24,7 @@ class UpdateMarcaRequest extends FormRequest
     public function rules()
     {
         return [
-            "nome" => 'unique:marcas,nome,'.$this->id.''
+            "nome" => 'unique:marcas,nome,'.$this->marca.''
         ];
     }
 

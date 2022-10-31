@@ -25,7 +25,7 @@ class UpdateModeloRequest extends FormRequest
     {
         return [
             "marca_id" => 'exists:marcas,id',
-            "nome" => 'unique:modelos,nome,'.$this->id.'',
+            "nome" => 'unique:modelos,nome,'.$this->modelo.'',
             "imagem" => "file|mimes:png",
             "numero_portas" => "integer",
             "lugares" => "integer",
