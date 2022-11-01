@@ -15,7 +15,8 @@ class ClienteController extends Controller
 
     public function __construct(Cliente $cliente)
     {
-        $this->cliente = $cliente;   
+        $this->cliente = $cliente; 
+        $this->middleware('jwt.auth', ['except' => ['index']]);  
     }
 
     /**
