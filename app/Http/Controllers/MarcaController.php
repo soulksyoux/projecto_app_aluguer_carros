@@ -205,4 +205,6 @@ class MarcaController extends Controller
         $marca->delete();
         return response()->json(["msg" => "Marca removida com sucesso"], 200);
     }
+
+
 }

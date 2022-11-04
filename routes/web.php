@@ -20,3 +20,6 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/marcas', function() {
+    return view("app.marcas", ["marcas" => [["a1", "a2", "a3"],["b1", "b2", "b3"]]]);
+})->name("marcas")->middleware("auth");
