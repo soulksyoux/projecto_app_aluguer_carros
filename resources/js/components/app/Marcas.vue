@@ -6,6 +6,18 @@
         modal_label="modal_marcas_label"
         modal_title="Adicionar Marca"
       >
+        <template v-slot:alertas>
+          <alert-component
+            v-if="sucesso == true"
+            type="success"
+            message="Registo gravado com sucesso!"
+          ></alert-component>
+          <alert-component
+            v-if="sucesso == false"
+            type="danger"
+            :message="mensagem_erro"
+          ></alert-component>
+        </template>
         <template v-slot:conteudo>
           <div class="mb-3">
             <input-container-component titulo="Nome" idInput="novoNome">
@@ -88,7 +100,7 @@
             fc="card-footer d-flex justify-content-end"
           >
             <template v-slot:card-body-data>
-              <table-component></table-component>
+              <table-component :dados="marcas" :titulos="titulos"></table-component>
             </template>
             <template v-slot:card-footer-data>
               <button
@@ -105,18 +117,24 @@
       </div>
     </div>
   </div>
+
 </template>
 
 
 
 
 <script>
+
 export default {
   data() {
     return {
       urlBase: "http://127.0.0.1:8000/api/v1/marca",
       nomeMarca: "",
       arquivoImagem: [],
+      sucesso: null,
+      mensagem_erro: "",
+      marcas: [],
+      titulos: ["Id", "Nome", "Imagem", "Created At"],
     };
   },
   computed: {
@@ -148,18 +166,50 @@ export default {
       let config = {
         headers: {
           "Content-Type": "multipart/form-data",
-          Accept: "application/json",
-          Authorization: this.getToken,
+          "Accept": "application/json",
+          "Authorization": this.getToken,
         },
       };
 
       try {
         const resposta = await axios.post(this.urlBase, formData, config);
-        console.log(resposta);
+        //console.log(resposta);
+        this.sucesso = true;
       } catch (erro) {
-        console.log(erro);
+        console.log(erro.response);
+        this.sucesso = false;
+        this.mensagem_erro = "Erro na gravação: " + erro.response.data.message;
       }
     },
+    async obterMarcas() {
+
+      let config = {
+        headers: {
+          "Accept": "application/json",
+          "Authorization": this.getToken,
+        },
+      };
+
+      try {
+        const resposta = await axios.get(this.urlBase, config);
+        const marcas_temp = resposta.data;
+        
+        this.marcas = marcas_temp.map(marca => {
+          return {
+            id:  marca.id,
+            nome: marca.nome,
+            imagem: marca.imagem,
+            created_at: marca.created_at,
+          }
+        });
+
+      } catch (erro) {
+        console.log(erro.response);
+      }
+    },
+  },
+  mounted() {
+    this.obterMarcas();
   },
 };
 </script>
