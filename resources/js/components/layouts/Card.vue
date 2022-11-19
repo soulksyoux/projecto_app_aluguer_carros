@@ -4,6 +4,7 @@
     <div class="card-header">{{ titulo }}</div>
     <div class="card-body">
         <slot name="card-body-data"></slot>
+        <slot name="pagination"></slot>
     </div>
     <div :class="fc">
         <slot name="card-footer-data"></slot>
