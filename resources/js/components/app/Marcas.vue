@@ -60,6 +60,77 @@
         </template>
       </modal-component>
 
+      <modal-component
+        id_modal="ver_marca_modal"
+        modal_label="modal_ver_marca_label"
+        modal_title="Ver Marca"
+      >
+        <template v-slot:alertas></template>
+        <template v-slot:conteudo>
+          <input-container-component titulo="ID">
+            <input type="text" class="form-control" :value="$store.state.item.id" disabled>
+          </input-container-component>
+          <input-container-component titulo="Marca">
+            <input type="text" class="form-control" :value="$store.state.item.nome" disabled>
+          </input-container-component>
+          <input-container-component titulo="Imagem">
+            <img :src="'/storage/' + $store.state.item.imagem"  v-if="$store.state.item.imagem" alt="">
+          </input-container-component>
+          <input-container-component titulo="Criação">
+            <input type="text" class="form-control" :value="$store.state.item.created_at" disabled>
+          </input-container-component>
+        </template>
+        <template v-slot:botoes>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Fechar
+          </button>
+        </template>
+      </modal-component>
+
+      <modal-component
+        id_modal="eliminar_marca_modal"
+        modal_label="modal_eliminar_marca_label"
+        modal_title="Eliminar Marca"
+      >
+        <template v-slot:alertas>
+           <alert-component
+            v-if="$store.state.transacao.status == 'sucesso'"
+            type="success"
+            :message="$store.state.transacao.mensagem" 
+          ></alert-component>
+          <alert-component
+            v-if="$store.state.transacao.status == 'erro'"
+            type="danger"
+            :message="$store.state.transacao.mensagem" 
+          ></alert-component>
+        </template>
+        <template v-slot:conteudo v-if="$store.state.transacao.status != 'sucesso'">
+          Deseja eliminar a marca?
+          <input-container-component titulo="ID">
+            <input type="text" class="form-control" :value="$store.state.item.id" disabled>
+          </input-container-component>
+          <input-container-component titulo="Marca">
+            <input type="text" class="form-control" :value="$store.state.item.nome" disabled>
+          </input-container-component>
+        </template>
+        <template v-slot:botoes>
+          <button type="button" class="btn btn-danger" @click="eliminarMarca()" v-if="$store.state.transacao.status != 'sucesso'">
+            Sim
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Fechar
+          </button>
+        </template>
+      </modal-component>
+
       <div class="col-md-8">
         <div class="card">
           <card-component titulo="Pesquisar marcas" fc="card-footer">
@@ -104,6 +175,9 @@
             <template v-slot:card-body-data>
               <table-component
                 :dados="marcas"
+                :ver="{visivel: true,  dataBsToggle: 'modal', dataBsTarget: '#ver_marca_modal'}"
+                :editar=true
+                :eliminar="{visivel: true,  dataBsToggle: 'modal', dataBsTarget: '#eliminar_marca_modal'}"
                 :titulos="titulos"
               ></table-component>
             </template>
@@ -262,6 +336,39 @@ export default {
         this.urlFiltro = '';
       }
       this.obterMarcas();
+    },
+    async eliminarMarca() {
+      let confirmacao = confirm("Tem a certeza que deseja eliminar o item?");
+      if(!confirmacao) {
+        return;
+      }
+
+      let config = {
+        headers: {
+          Accept: "application/json",
+          Authorization: this.getToken,
+        },
+      };
+
+      let url = this.urlBase + "/" + this.$store.state.item.id;
+
+      let formData = new FormData();
+      formData.append("_method", "delete");
+
+      //this.$store.state.transacao.status = "erro";
+      //this.$store.state.transacao.mensagem = "Registo eliminado com sucesso";
+      
+      try {
+        const resposta = await axios.post(url, formData, config);
+        this.$store.state.transacao.status = "sucesso";
+        this.$store.state.transacao.mensagem = resposta.data.msg;
+        this.obterMarcas();
+      } catch (erro) {
+          this.$store.state.transacao.status = "erro";
+          this.$store.state.transacao.mensagem = erro.response.data.erro;
+      }
+      
+      
     }
   },
   mounted() {
